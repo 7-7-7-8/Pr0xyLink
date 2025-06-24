@@ -146,15 +146,16 @@
       let userUrl = input.value.trim();
       if (!userUrl) return;
 
-      // Prepend https:// if missing
-      if (!/^https?:\/\//i.test(userUrl)) {
-        userUrl = 'https://' + userUrl;
-      }
-
       let finalUrl;
       if (mode.value === "proxy") {
-        finalUrl = 'https://embeddr.rhw.one/embed#https://' + encodeURIComponent(userUrl);
+        // Remove http:// or https:// if present
+        userUrl = userUrl.replace(/^https?:\/\//i, '');
+        finalUrl = 'https://embeddr.rhw.one/embed#' + encodeURIComponent(userUrl);
       } else {
+        // Prepend https:// if missing
+        if (!/^https?:\/\//i.test(userUrl)) {
+          userUrl = 'https://' + userUrl;
+        }
         finalUrl = userUrl;
       }
 
