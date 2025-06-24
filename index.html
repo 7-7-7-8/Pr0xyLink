@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Embeddr Proxy Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #e0e6f8;
+      background: linear-gradient(120deg, #101522 0%, #1e2a4a 50%, #3aaaff 100%);
+      background-size: 200% 200%;
+      animation: gradientMove 8s ease-in-out infinite;
+      transition: background 0.2s;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 {
+      margin-top: 3rem;
+      font-size: 2rem;
+      color: #3aaaff;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-align: center;
+      background: rgba(16,21,34,0.7);
+      border-radius: 12px;
+      padding: 0.5rem 1.2rem;
+      box-shadow: 0 2px 16px rgba(58,170,255,0.07);
+    }
+    form {
+      margin: 2rem 0 1.5rem 0;
+      display: flex;
+      gap: 0;
+      width: 100%;
+      max-width: 420px;
+      background: rgba(16,21,34,0.8);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(58,170,255,0.06);
+      align-items: center;
+    }
+    input[type="url"] {
+      flex: 2;
+      padding: 0.8rem 1.1rem;
+      border: none;
+      border-radius: 8px 0 0 8px;
+      font-size: 1rem;
+      background: transparent;
+      color: #e0e6f8;
+      outline: none;
+      transition: box-shadow 0.2s;
+    }
+    input[type="url"]:focus {
+      box-shadow: 0 0 0 2px #3aaaff;
+      background: rgba(34,36,58,0.9);
+    }
+    select {
+      flex: 1;
+      padding: 0.8rem 0.5rem;
+      border: none;
+      background: #181b2c;
+      color: #3aaaff;
+      font-size: 1rem;
+      border-radius: 0;
+      outline: none;
+      transition: background 0.2s;
+      margin: 0;
+    }
+    button {
+      padding: 0.8rem 1.4rem;
+      background: #3aaaff;
+      color: #fff;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+    #iframe-container {
+      width: 100%;
+      max-width: 900px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    iframe {
+      width: 100%;
+      min-height: 60vh;
+      border: none;
+      border-radius: 10px;
+      background: #181b2c;
+      box-shadow: 0 4px 24px rgba(58,170,255,0.12);
+      margin-bottom: 2rem;
+      transition: box-shadow 0.2s;
+    }
+    @media (max-width: 600px) {
+      form, #iframe-container {
+        max-width: 98vw;
+      }
+      iframe {
+        min-height: 40vh;
+      }
+      h1 {
+        font-size: 1.3rem;
+        padding: 0.4rem 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Embeddr Proxy Viewer</h1>
+  <form id="embedForm" autocomplete="off">
+    <input type="url" id="targetUrl" placeholder="Enter URL..." required>
+    <select id="mode">
+      <option value="proxy">Run with Proxy</option>
+      <option value="direct">Open Directly</option>
+    </select>
+    <button type="submit">Go</button>
+  </form>
+  <div id="iframe-container"></div>
+  <script>
+    const form = document.getElementById('embedForm');
+    const input = document.getElementById('targetUrl');
+    const mode = document.getElementById('mode');
+    const iframeContainer = document.getElementById('iframe-container');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const userUrl = input.value.trim();
+      if (!userUrl) return;
+
+      let finalUrl;
+      if (mode.value === "proxy") {
+        finalUrl = 'https://embeddr.rhw.one/embed#' + encodeURIComponent(userUrl);
+      } else {
+        finalUrl = userUrl;
+      }
+
+      // Open in about:blank with minimal UI
+      const win = window.open('about:blank', '_blank');
+      if (win) {
+        win.document.write(`
+          <body style="margin:0;background:#101522;">
+            <iframe src="${finalUrl}" style="border:none;width:100vw;height:100vh;display:block;background:#181b2c;"></iframe>
+          </body>
+        `);
+        win.document.close();
+      } else {
+        // Fallback: show in this page
+        iframeContainer.innerHTML = `<iframe src="${finalUrl}" allowfullscreen></iframe>`;
+      }
+    });
+  </script>
+</body>
+</html>
