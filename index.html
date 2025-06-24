@@ -51,7 +51,7 @@
       box-shadow: 0 2px 12px rgba(58,170,255,0.06);
       align-items: center;
     }
-    input[type="url"] {
+    input[type="text"] {
       flex: 2;
       padding: 0.8rem 1.1rem;
       border: none;
@@ -62,7 +62,7 @@
       outline: none;
       transition: box-shadow 0.2s;
     }
-    input[type="url"]:focus {
+    input[type="text"]:focus {
       box-shadow: 0 0 0 2px #3aaaff;
       background: rgba(34,36,58,0.9);
     }
@@ -127,7 +127,7 @@
 <body>
   <h1>Embeddr Proxy Viewer</h1>
   <form id="embedForm" autocomplete="off">
-    <input type="url" id="targetUrl" placeholder="Enter URL..." required>
+    <input type="text" id="targetUrl" placeholder="Enter domain or URL..." required>
     <select id="mode">
       <option value="proxy">Run with Proxy</option>
       <option value="direct">Open Directly</option>
@@ -143,8 +143,13 @@
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const userUrl = input.value.trim();
+      let userUrl = input.value.trim();
       if (!userUrl) return;
+
+      // Prepend https:// if missing
+      if (!/^https?:\/\//i.test(userUrl)) {
+        userUrl = 'https://' + userUrl;
+      }
 
       let finalUrl;
       if (mode.value === "proxy") {
@@ -153,18 +158,18 @@
         finalUrl = userUrl;
       }
 
-      // Open in about:blank with minimal UI
+      // Open in about:blank with minimal UI and sandboxed iframe
       const win = window.open('about:blank', '_blank');
       if (win) {
         win.document.write(`
           <body style="margin:0;background:#101522;">
-            <iframe src="${finalUrl}" style="border:none;width:100vw;height:100vh;display:block;background:#181b2c;"></iframe>
+            <iframe src="${finalUrl}" sandbox="" style="border:none;width:100vw;height:100vh;display:block;background:#181b2c;"></iframe>
           </body>
         `);
         win.document.close();
       } else {
         // Fallback: show in this page
-        iframeContainer.innerHTML = `<iframe src="${finalUrl}" allowfullscreen></iframe>`;
+        iframeContainer.innerHTML = `<iframe src="${finalUrl}" sandbox="" allowfullscreen></iframe>`;
       }
     });
   </script>
