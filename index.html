@@ -151,26 +151,27 @@
         // Remove http:// or https:// if present
         userUrl = userUrl.replace(/^https?:\/\//i, '');
         finalUrl = 'https://embeddr.rhw.one/embed#' + encodeURIComponent(userUrl);
+        // Frame the proxy in-page
+        iframeContainer.innerHTML = `<iframe src="${finalUrl}" sandbox="" allowfullscreen></iframe>`;
       } else {
         // Prepend https:// if missing
         if (!/^https?:\/\//i.test(userUrl)) {
           userUrl = 'https://' + userUrl;
         }
         finalUrl = userUrl;
-      }
-
-      // Open in about:blank with minimal UI and sandboxed iframe
-      const win = window.open('about:blank', '_blank');
-      if (win) {
-        win.document.write(`
-          <body style="margin:0;background:#101522;">
-            <iframe src="${finalUrl}" sandbox="" style="border:none;width:100vw;height:100vh;display:block;background:#181b2c;"></iframe>
-          </body>
-        `);
-        win.document.close();
-      } else {
-        // Fallback: show in this page
-        iframeContainer.innerHTML = `<iframe src="${finalUrl}" sandbox="" allowfullscreen></iframe>`;
+        // Open in about:blank with minimal UI and sandboxed iframe
+        const win = window.open('about:blank', '_blank');
+        if (win) {
+          win.document.write(`
+            <body style="margin:0;background:#101522;">
+              <iframe src="${finalUrl}" sandbox="" style="border:none;width:100vw;height:100vh;display:block;background:#181b2c;"></iframe>
+            </body>
+          `);
+          win.document.close();
+        } else {
+          // Fallback: show in this page
+          iframeContainer.innerHTML = `<iframe src="${finalUrl}" sandbox="" allowfullscreen></iframe>`;
+        }
       }
     });
   </script>
